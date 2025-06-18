@@ -18,4 +18,5 @@ public class FinanceAnalyzerApplication {
 		return new BCryptPasswordEncoder();
 	}
 
+
 }
