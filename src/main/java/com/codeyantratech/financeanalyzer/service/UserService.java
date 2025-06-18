@@ -1,5 +1,6 @@
 package com.codeyantratech.financeanalyzer.service;
 
+import com.codeyantratech.financeanalyzer.dto.UserProfileRequest;
 import com.codeyantratech.financeanalyzer.model.User;
 import com.codeyantratech.financeanalyzer.repository.UserRepository;
 import com.codeyantratech.financeanalyzer.security.UserPrincipal;
@@ -219,6 +220,43 @@ public class UserService implements UserDetailsService {
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setEmail(email);
+
+        return userRepository.save(user);
+    }
+
+    /**
+     * Updates a user's profile settings.
+     *
+     * @param username The username of the user to update
+     * @param request  The profile update request containing new settings
+     * @return The updated user entity
+     */
+    @Transactional
+    public User updateUserProfile(String username, UserProfileRequest request) {
+        User user = getCurrentUser(username);
+
+        // Update profile settings
+        if (request.getMonthlyBudgetLimit() != null) {
+            user.setMonthlyBudgetLimit(request.getMonthlyBudgetLimit());
+        }
+        if (request.getAutoCategorizationEnabled() != null) {
+            user.setAutoCategorizationEnabled(request.getAutoCategorizationEnabled());
+        }
+        if (request.getPreferredCurrency() != null) {
+            user.setPreferredCurrency(request.getPreferredCurrency());
+        }
+        if (request.getNotificationEmailEnabled() != null) {
+            user.setNotificationEmailEnabled(request.getNotificationEmailEnabled());
+        }
+        if (request.getNotificationSmsEnabled() != null) {
+            user.setNotificationSmsEnabled(request.getNotificationSmsEnabled());
+        }
+        if (request.getFirstName() != null) {
+            user.setFirstName(request.getFirstName());
+        }
+        if (request.getLastName() != null) {
+            user.setLastName(request.getLastName());
+        }
 
         return userRepository.save(user);
     }

@@ -50,9 +50,13 @@ public class CsvProcessingService {
      */
     @Transactional
     public void processTransactionCsv(MultipartFile file, String username) {
+        FileUpload fileUpload = null;
         try {
             // Save file upload record
-            FileUpload fileUpload = fileUploadService.saveFile(file, username);
+            fileUpload = fileUploadService.saveFile(file, username);
+            fileUpload.setStatus("PROCESSING");
+            fileUpload = fileUploadService.updateFileUpload(fileUpload);
+
             User user = userService.getCurrentUser(username);
 
             // Process CSV file
@@ -61,14 +65,25 @@ public class CsvProcessingService {
             // Save transactions
             transactions.forEach(transactionService::saveTransaction);
             
-            // Mark file as processed
-            fileUploadService.markFileAsProcessed(fileUpload, transactions.size());
+            // Mark file as processed successfully
+            fileUpload.setStatus("SUCCESS");
+            fileUpload.setProcessed(true);
+            fileUpload.setRecordsCount(transactions.size());
+            fileUploadService.updateFileUpload(fileUpload);
             
             log.info("Successfully processed {} transactions from file: {}", 
                     transactions.size(), file.getOriginalFilename());
             
         } catch (Exception e) {
             log.error("Error processing CSV file: {}", e.getMessage());
+            
+            // Update file upload record with error details
+            if (fileUpload != null) {
+                fileUpload.setStatus("FAILED");
+                fileUpload.setErrorDetails(e.getMessage());
+                fileUploadService.updateFileUpload(fileUpload);
+            }
+            
             throw new RuntimeException("Failed to process CSV file: " + e.getMessage());
         }
     }

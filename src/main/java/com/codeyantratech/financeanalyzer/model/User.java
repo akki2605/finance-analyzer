@@ -53,6 +53,23 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<FileUpload> fileUploads;
 
+    @Column(name = "monthly_budget_limit", precision = 12, scale = 2)
+    private java.math.BigDecimal monthlyBudgetLimit;
+
+    @Column(name = "auto_categorization_enabled")
+    private Boolean autoCategorizationEnabled = false;
+
+    @Column(name = "preferred_currency", length = 10)
+    private String preferredCurrency;
+
+    @Column(name = "notification_email_enabled")
+    private Boolean notificationEmailEnabled = true;
+
+    @Column(name = "notification_sms_enabled")
+    private Boolean notificationSmsEnabled = false;
+
+    // TODO: Add keyword-to-category mapping (custom rules) in future phase
+
     // Custom constructor for basic fields
     public User(String username, String email, String password) {
         this.username = username;
