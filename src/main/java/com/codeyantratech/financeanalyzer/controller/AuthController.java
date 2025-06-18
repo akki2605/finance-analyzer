@@ -1,11 +1,13 @@
 package com.codeyantratech.financeanalyzer.controller;
 
+import com.codeyantratech.financeanalyzer.dto.ApiResponse;
 import com.codeyantratech.financeanalyzer.dto.AuthResponse;
 import com.codeyantratech.financeanalyzer.dto.LoginRequest;
 import com.codeyantratech.financeanalyzer.dto.SignupRequest;
 import com.codeyantratech.financeanalyzer.model.User;
 import com.codeyantratech.financeanalyzer.security.JwtUtils;
 import com.codeyantratech.financeanalyzer.security.UserPrincipal;
+import com.codeyantratech.financeanalyzer.service.CategoryService;
 import com.codeyantratech.financeanalyzer.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * REST Controller for handling authentication operations.
@@ -33,6 +32,7 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
+    private final CategoryService categoryService;
     private final JwtUtils jwtUtils;
 
     /**
@@ -68,7 +68,7 @@ public class AuthController {
     }
 
     /**
-     * Registers a new user account.
+     * Registers a new user account and initializes default categories for the user.
      * Validates that username and email are not already taken.
      * Automatically logs in the user after successful registration.
      *
@@ -78,32 +78,19 @@ public class AuthController {
      */
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
-        User user = userService.createUser(
-            signupRequest.getUsername(),
-            signupRequest.getEmail(),
-            signupRequest.getPassword(),
-            signupRequest.getFirstName(),
-            signupRequest.getLastName()
-        );
-
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
+        // Create new user account
+        User newUser = userService.createUser(
                 signupRequest.getUsername(),
-                signupRequest.getPassword()
-            )
+                signupRequest.getEmail(),
+                signupRequest.getPassword(),
+                signupRequest.getFirstName(),
+                signupRequest.getLastName()
         );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        String jwt = jwtUtils.generateToken(userPrincipal);
+        // Initialize default categories for the new user
+        categoryService.createDefaultCategoriesForUser(newUser);
 
-        return ResponseEntity.ok(AuthResponse.builder()
-                .token(jwt)
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .message("User registered successfully")
-                .build());
+        return ResponseEntity.ok(new ApiResponse(true, "User registered successfully"));
     }
+
 } 
