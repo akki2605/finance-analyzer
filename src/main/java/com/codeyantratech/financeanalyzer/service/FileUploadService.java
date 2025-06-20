@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -26,24 +27,31 @@ public class FileUploadService {
 
     /**
      * Saves metadata for an uploaded file.
+     *
+     * @param file     The uploaded MultipartFile
+     * @param username The username of the user uploading the file
+     * @return FileUpload entity containing the file metadata
+     * @throws IOException if there's an error handling the file
      */
     @Transactional
     public FileUpload saveFile(MultipartFile file, String username) throws IOException {
         User user = userService.getCurrentUser(username);
-        FileUpload fileUpload = new FileUpload(user, file.getOriginalFilename(), file.getSize());
-        return fileUploadRepository.save(fileUpload);
-    }
-
-    /**
-     * Updates an existing file upload record.
-     */
-    @Transactional
-    public FileUpload updateFileUpload(FileUpload fileUpload) {
+        
+        // Create new file upload record
+        FileUpload fileUpload = new FileUpload(
+            user,
+            file.getOriginalFilename(),
+            file.getSize()
+        );
+        
         return fileUploadRepository.save(fileUpload);
     }
 
     /**
      * Retrieves all files uploaded by a specific user.
+     *
+     * @param username The username of the user
+     * @return List of FileUpload entities ordered by upload date descending
      */
     @Transactional(readOnly = true)
     public List<FileUpload> getUserFiles(String username) {
@@ -53,6 +61,11 @@ public class FileUploadService {
 
     /**
      * Retrieves a specific file upload record by ID for a user.
+     *
+     * @param fileId   The ID of the file upload record
+     * @param username The username of the user requesting the file
+     * @return FileUpload entity if found and owned by the user
+     * @throws RuntimeException if the file is not found or user doesn't have access
      */
     @Transactional(readOnly = true)
     public FileUpload getFileById(Long fileId, String username) {
@@ -63,12 +76,14 @@ public class FileUploadService {
 
     /**
      * Updates a file upload record to mark it as processed.
+     *
+     * @param fileUpload   The FileUpload entity to update
+     * @param recordsCount The number of records successfully processed from the file
      */
     @Transactional
     public void markFileAsProcessed(FileUpload fileUpload, int recordsCount) {
         fileUpload.setProcessed(true);
         fileUpload.setRecordsCount(recordsCount);
-        fileUpload.setStatus("SUCCESS");
         fileUploadRepository.save(fileUpload);
     }
 } 
