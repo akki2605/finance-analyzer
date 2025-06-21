@@ -8,8 +8,8 @@ import com.codeyantratech.financeanalyzer.model.User;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,12 +30,16 @@ import java.util.List;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class CsvProcessingService {
 
-    private final FileUploadService fileUploadService;
-    private final TransactionService transactionService;
-    private final UserService userService;
+    @Autowired
+    private FileUploadService fileUploadService;
+    
+    @Autowired
+    private TransactionService transactionService;
+    
+    @Autowired
+    private UserService userService;
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 

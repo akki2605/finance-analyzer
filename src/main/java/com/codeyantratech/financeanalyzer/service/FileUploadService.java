@@ -3,8 +3,8 @@ package com.codeyantratech.financeanalyzer.service;
 import com.codeyantratech.financeanalyzer.model.FileUpload;
 import com.codeyantratech.financeanalyzer.model.User;
 import com.codeyantratech.financeanalyzer.repository.FileUploadRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,11 +19,13 @@ import java.util.List;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class FileUploadService {
 
-    private final FileUploadRepository fileUploadRepository;
-    private final UserService userService;
+    @Autowired
+    private FileUploadRepository fileUploadRepository;
+    
+    @Autowired
+    private UserService userService;
 
     /**
      * Saves metadata for an uploaded file.

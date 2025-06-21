@@ -10,8 +10,8 @@ import com.codeyantratech.financeanalyzer.security.UserPrincipal;
 import com.codeyantratech.financeanalyzer.service.CategoryService;
 import com.codeyantratech.financeanalyzer.service.UserService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,13 +27,19 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
-    private final UserService userService;
-    private final CategoryService categoryService;
-    private final JwtUtils jwtUtils;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    
+    @Autowired
+    private UserService userService;
+    
+    @Autowired
+    private CategoryService categoryService;
+    
+    @Autowired
+    private JwtUtils jwtUtils;
 
     /**
      * Authenticates a user and generates a JWT token.
@@ -90,7 +96,7 @@ public class AuthController {
         // Initialize default categories for the new user
         categoryService.createDefaultCategoriesForUser(newUser);
 
-        return ResponseEntity.ok(new ApiResponse(true, "User registered successfully"));
+        return ResponseEntity.ok(ApiResponse.success("User registered successfully"));
     }
 
 } 

@@ -5,8 +5,8 @@ import com.codeyantratech.financeanalyzer.model.FileUpload;
 import com.codeyantratech.financeanalyzer.security.UserPrincipal;
 import com.codeyantratech.financeanalyzer.service.CsvProcessingService;
 import com.codeyantratech.financeanalyzer.service.FileUploadService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -21,11 +21,13 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/api/files")
-@RequiredArgsConstructor
 public class FileUploadController {
 
-    private final FileUploadService fileUploadService;
-    private final CsvProcessingService csvProcessingService;
+    @Autowired
+    private FileUploadService fileUploadService;
+    
+    @Autowired
+    private CsvProcessingService csvProcessingService;
 
     /**
      * Handles file upload requests.
@@ -43,23 +45,23 @@ public class FileUploadController {
         
         if (file.isEmpty()) {
             return ResponseEntity.badRequest()
-                    .body(new ApiResponse(false, "Please select a file to upload"));
+                    .body(ApiResponse.error("Please select a file to upload"));
         }
 
         // Validate file type
         String filename = file.getOriginalFilename();
         if (filename == null || !filename.toLowerCase().endsWith(".csv")) {
             return ResponseEntity.badRequest()
-                    .body(new ApiResponse(false, "Please upload a CSV file"));
+                    .body(ApiResponse.error("Please upload a CSV file"));
         }
 
         try {
             csvProcessingService.processTransactionCsv(file, userPrincipal.getUsername());
-            return ResponseEntity.ok(new ApiResponse(true, "File uploaded and processed successfully"));
+            return ResponseEntity.ok(ApiResponse.success("File uploaded and processed successfully"));
         } catch (Exception e) {
             log.error("Error processing file upload: {}", e.getMessage());
             return ResponseEntity.badRequest()
-                    .body(new ApiResponse(false, "Error processing file: " + e.getMessage()));
+                    .body(ApiResponse.error("Error processing file: " + e.getMessage()));
         }
     }
 

@@ -10,8 +10,8 @@ import com.codeyantratech.financeanalyzer.security.UserPrincipal;
 import com.codeyantratech.financeanalyzer.service.TransactionService;
 import com.codeyantratech.financeanalyzer.service.UserService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -22,11 +22,13 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping("/api")
-@RequiredArgsConstructor
 public class TransactionController {
 
-    private final TransactionService transactionService;
-    private final UserService userService;
+    @Autowired
+    private TransactionService transactionService;
+    
+    @Autowired
+    private UserService userService;
 
     /**
      * List all transactions for the authenticated user

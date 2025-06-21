@@ -50,6 +50,7 @@ public class Transaction extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
+    @Builder.Default
     private TransactionSource source = TransactionSource.MANUAL;
 
     // Custom constructor for basic transaction

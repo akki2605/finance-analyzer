@@ -3,8 +3,8 @@ package com.codeyantratech.financeanalyzer.service;
 import com.codeyantratech.financeanalyzer.model.Category;
 import com.codeyantratech.financeanalyzer.model.User;
 import com.codeyantratech.financeanalyzer.repository.CategoryRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,11 +18,13 @@ import java.util.List;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class CategoryService {
 
-    private final CategoryRepository categoryRepository;
-    private final UserService userService;
+    @Autowired
+    private CategoryRepository categoryRepository;
+    
+    @Autowired
+    private UserService userService;
 
     // Default categories template with their colors
     private static final List<DefaultCategory> DEFAULT_CATEGORIES = Arrays.asList(

@@ -103,7 +103,7 @@ public class JwtUtils {
             getAllClaimsFromToken(token);
             return !isTokenExpired(token);
         } catch (JwtException e) {
-            log.error("JWT validation error: {}", e.getMessage());
+            log.error("JWT validation error : {}", e.getMessage());
             return false;
         }
     }

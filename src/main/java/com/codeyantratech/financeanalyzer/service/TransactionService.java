@@ -3,8 +3,8 @@ package com.codeyantratech.financeanalyzer.service;
 import com.codeyantratech.financeanalyzer.model.Transaction;
 import com.codeyantratech.financeanalyzer.model.User;
 import com.codeyantratech.financeanalyzer.repository.TransactionRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,11 +16,13 @@ import java.util.List;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class TransactionService {
 
-    private final TransactionRepository transactionRepository;
-    private final UserService userService;
+    @Autowired
+    private TransactionRepository transactionRepository;
+    
+    @Autowired
+    private UserService userService;
 
     /**
      * Saves a new transaction or updates an existing one.
