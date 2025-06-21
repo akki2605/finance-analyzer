@@ -1,6 +1,7 @@
 package com.codeyantratech.financeanalyzer.controller;
 
 import com.codeyantratech.financeanalyzer.dto.ApiResponse;
+import com.codeyantratech.financeanalyzer.dto.FileUploadResponse;
 import com.codeyantratech.financeanalyzer.model.FileUpload;
 import com.codeyantratech.financeanalyzer.security.UserPrincipal;
 import com.codeyantratech.financeanalyzer.service.CsvProcessingService;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * REST Controller for handling file upload operations.
@@ -72,9 +74,12 @@ public class FileUploadController {
      * @return List of file upload records
      */
     @GetMapping
-    public ResponseEntity<List<FileUpload>> getUserFiles(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public ResponseEntity<List<FileUploadResponse>> getUserFiles(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         List<FileUpload> files = fileUploadService.getUserFiles(userPrincipal.getUsername());
-        return ResponseEntity.ok(files);
+        List<FileUploadResponse> response = files.stream()
+                .map(this::toFileUploadResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -85,11 +90,24 @@ public class FileUploadController {
      * @return The requested file upload record if found and owned by the user
      */
     @GetMapping("/{fileId}")
-    public ResponseEntity<FileUpload> getFileDetails(
+    public ResponseEntity<FileUploadResponse> getFileDetails(
             @PathVariable Long fileId,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
         
         FileUpload file = fileUploadService.getFileById(fileId, userPrincipal.getUsername());
-        return ResponseEntity.ok(file);
+        return ResponseEntity.ok(toFileUploadResponse(file));
+    }
+
+    private FileUploadResponse toFileUploadResponse(FileUpload fileUpload) {
+        return FileUploadResponse.builder()
+                .id(fileUpload.getId())
+                .filename(fileUpload.getFilename())
+                .fileSize(fileUpload.getFileSize())
+                .uploadDate(fileUpload.getUploadDate())
+                .processed(fileUpload.getProcessed())
+                .recordsCount(fileUpload.getRecordsCount())
+                .status(fileUpload.getStatus())
+                .errorDetails(fileUpload.getErrorDetails())
+                .build();
     }
 } 

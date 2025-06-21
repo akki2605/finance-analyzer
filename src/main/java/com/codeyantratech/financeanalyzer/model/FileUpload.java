@@ -41,6 +41,12 @@ public class FileUpload {
     @Column(name = "records_count")
     private Integer recordsCount = 0;
 
+    @Column(name = "status", length = 20)
+    private String status; // e.g., SUCCESS, FAILED
+
+    @Column(name = "error_details", columnDefinition = "TEXT")
+    private String errorDetails;
+
     // Custom constructor for file upload
     public FileUpload(User user, String filename, Long fileSize) {
         this.user = user;

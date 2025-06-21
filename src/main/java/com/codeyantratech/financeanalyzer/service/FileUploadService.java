@@ -50,6 +50,14 @@ public class FileUploadService {
     }
 
     /**
+     * Updates an existing file upload record.
+     */
+    @Transactional
+    public FileUpload updateFileUpload(FileUpload fileUpload) {
+        return fileUploadRepository.save(fileUpload);
+    }
+
+    /**
      * Retrieves all files uploaded by a specific user.
      *
      * @param username The username of the user
